@@ -26,12 +26,18 @@ def main():
     html=project/'index.html';text=html.read_text()
     text=text.replace('</head>',"<style>@font-face{font-family:'Inter';src:url('assets/Inter.ttf') format('truetype');font-weight:100 900;font-style:normal;font-display:block}</style></head>",1)
     html.write_text(text)
+    # Lossless PNG with faster encoding; changes capture cost, never scene pixels.
+    build=project/'build.py'
+    code=build.read_text().replace('import argparse', 'import argparse\nimport base64')
+    code=code.replace('        ff = None', '        cdp = page.context.new_cdp_session(page)\n        ff = None')
+    code=code.replace("page.screenshot(type='png')", "base64.b64decode(cdp.send('Page.captureScreenshot', {'format':'png', 'optimizeForSpeed':True, 'captureBeyondViewport':False})['data'])")
+    build.write_text(code)
     out=Path('/out');out.mkdir(exist_ok=True)
     # Same production HTML, including all original CSS and vector assets.
     run([sys.executable,project/'render.py','6.6','19.72','19.94','20.10','32.8','36.8'])
     import shutil
     shutil.copytree(project/'qa',out/'qa',dirs_exist_ok=True)
-    run([sys.executable,project/'build.py','--samples','8','--output',out/'video.mp4'],timeout=3600)
+    run([sys.executable,project/'build.py','--samples','8','--output',out/'video.mp4'],timeout=6600)
     run(['ffmpeg','-v','error','-i',out/'video.mp4','-f','null','-'])
     meta=json.loads(subprocess.check_output(['ffprobe','-v','error','-show_streams','-show_format','-of','json',str(out/'video.mp4')]))
     (out/'metadata.json').write_text(json.dumps(meta))
