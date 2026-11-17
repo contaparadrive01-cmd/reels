@@ -1,6 +1,6 @@
 FROM python:3.12-slim-bookworm AS builder
 ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1 CHROMIUM_PATH=/usr/bin/chromium
-RUN apt-get update && apt-get install -y --no-install-recommends chromium ffmpeg fonts-dejavu-core ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends libatomic1 chromium ffmpeg fonts-dejavu-core ca-certificates && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir playwright numpy pillow
 WORKDIR /runner
 COPY job.py /runner/job.py
