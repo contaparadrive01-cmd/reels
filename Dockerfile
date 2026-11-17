@@ -1,0 +1,41 @@
+FROM python:3.12-slim-bookworm AS builder
+ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1 CHROMIUM_PATH=/usr/bin/chromium
+RUN apt-get update && apt-get install -y --no-install-recommends chromium ffmpeg fonts-dejavu-core ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir playwright numpy pillow
+WORKDIR /runner
+COPY job.py /runner/job.py
+ARG PROJECT_PART_000
+ARG PROJECT_PART_001
+ARG PROJECT_PART_002
+ARG PROJECT_PART_003
+ARG PROJECT_PART_004
+ARG PROJECT_PART_005
+ARG PROJECT_PART_006
+ARG PROJECT_PART_007
+ARG PROJECT_PART_008
+ARG PROJECT_PART_009
+ARG PROJECT_PART_010
+ARG PROJECT_PART_011
+ARG PROJECT_PART_012
+ARG PROJECT_PART_013
+ARG PROJECT_PART_014
+ARG PROJECT_PART_015
+ARG PROJECT_PART_016
+ARG PROJECT_PART_017
+ARG PROJECT_PART_018
+ARG PROJECT_PART_019
+ARG PROJECT_PART_020
+ARG PROJECT_PART_021
+ARG PROJECT_PART_022
+ARG PROJECT_PART_023
+ARG PROJECT_PART_024
+ARG PROJECT_PART_025
+ARG PROJECT_SHA256
+RUN python /runner/job.py
+FROM python:3.12-slim-bookworm AS server
+WORKDIR /runner
+COPY server.py /runner/server.py
+COPY --from=builder /out /out
+ENV PYTHONUNBUFFERED=1
+EXPOSE 10000
+CMD ["python", "/runner/server.py"]
