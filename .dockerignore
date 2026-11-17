@@ -1,0 +1,7 @@
+.git
+.env
+*.zip
+*.mp4
+*.ipynb
+*.json
+__pycache__
